@@ -3,16 +3,18 @@ import gym
 class train_params:
     
     # Environment parameters
-    ENV = 'Pendulum-v0'                     # Environment to use (must have low dimensional state space (i.e. not image) and continuous action space)
+    ENV = 'FetchSlide-v1'                     # Environment to use (must have low dimensional state space (i.e. not image) and continuous action space)
     RENDER = False                          # Whether or not to display the environment on the screen during training
     RANDOM_SEED = 99999999                  # Random seed for reproducability
     NUM_AGENTS = 4                          # Number of distributed agents to run simultaneously
     
     # Create dummy environment to get all environment params
-    dummy_env = gym.make(ENV)      
-    STATE_DIMS = dummy_env.observation_space.shape
-    STATE_BOUND_LOW = dummy_env.observation_space.low
-    STATE_BOUND_HIGH = dummy_env.observation_space.high
+    dummy_env = gym.make(ENV)
+
+    # Hardcoded and empirical bounds and values
+    STATE_DIMS = (31, ) #dummy_env.observation_space.shape
+    STATE_BOUND_LOW = -10 #dummy_env.observation_space.low
+    STATE_BOUND_HIGH = 10 #dummy_env.observation_space.high
     ACTION_DIMS = dummy_env.action_space.shape
     ACTION_BOUND_LOW = dummy_env.action_space.low
     ACTION_BOUND_HIGH = dummy_env.action_space.high
@@ -48,7 +50,7 @@ class train_params:
     USE_BATCH_NORM = False          # Whether or not to use batch normalisation in the networks
   
     # Files/Directories
-    SAVE_CKPT_STEP = 10000                  # Save checkpoint every save_ckpt_step training steps
+    SAVE_CKPT_STEP = 50                  # Save checkpoint every save_ckpt_step training steps
     CKPT_DIR = './ckpts/' + ENV             # Directory for saving/loading checkpoints
     CKPT_FILE = None                        # Checkpoint file to load and resume training from (if None, train from scratch)
     LOG_DIR = './logs/train/' + ENV         # Directory for saving Tensorboard logs (if None, do not save logs)

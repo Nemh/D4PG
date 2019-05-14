@@ -15,7 +15,7 @@ import imageio
 
 from params import train_params, test_params, play_params
 from utils.network import Actor, Actor_BN
-from utils.env_wrapper import PendulumWrapper, LunarLanderContinuousWrapper, BipedalWalkerWrapper
+from utils.env_wrapper import PendulumWrapper, LunarLanderContinuousWrapper, BipedalWalkerWrapper, FetchSlideWrapper
 
 class Agent:
   
@@ -32,6 +32,8 @@ class Agent:
             self.env_wrapper = LunarLanderContinuousWrapper(env)
         elif env == 'BipedalWalker-v2':
             self.env_wrapper = BipedalWalkerWrapper(env)
+        elif env in ['FetchSlide-v1', 'FetchSlide2-v1']:
+            self.env_wrapper = FetchSlideWrapper(env)
         else:
             raise Exception('Chosen environment does not have an environment wrapper defined. Please choose an environment with an environment wrapper defined, or create a wrapper for this environment in utils.env_wrapper.py')
         self.env_wrapper.set_random_seed(seed*(n_agent+1))

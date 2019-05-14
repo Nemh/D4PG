@@ -5,6 +5,7 @@
 '''
 
 import gym
+import numpy as np
 from params import train_params
 
 class EnvWrapper:
@@ -105,6 +106,52 @@ class BipedalWalkerWrapper(EnvWrapper):
         # Normalise reward values
         return reward/100.0
 
+class FetchSlideWrapper(EnvWrapper):
+    def __init__(self, env_name):
+        self.env_name = env_name           
+        self.env = gym.make(self.env_name)
+
+    # State is (with empirical bounds): [
+    #   grid_pos (3) (coords) in [0, 2]
+    #   object_pos (3) (coords) in [0, 2]
+    #   object_rel_pos (3) (object_pos - grip_pos) (coords) in [-2,2]
+    #   gripper_state (2) (?) (always 0...)
+    #   object_rot (3) (angles, in radians (-pi < angle < pi)
+    #   object_velp (3) (velocity) in [-0.2,0.2]
+    #   object_velr (3) (velocity) in [-2,2]
+    #   grip_velp (3) (velocity) in [-0.05,0.05]
+    #   gripper_vel (2) (?) in [-0.3,0.3] 
+    def normalise_state(self, state):
+        grip_pos = state['observation'][0:3]
+        object_pos = state['observation'][3:6]
+        object_rel_pos = state['observation'][6:9]
+        gripper_state = state['observation'][9:11]
+        object_rot = state['observation'][11:14]
+        object_velp = state['observation'][14:17]
+        object_velr = state['observation'][17:20]
+        grip_velp = state['observation'][20:23]
+        gripper_vel = state['observation'][23:25]
+
+        achieved_goal = state['achieved_goal'] # in [0, 2]
+        desired_goal = state['desired_goal'] # in [0, 2]
+
+        grip_pos /= 2
+        object_pos /= 2
+        object_rel_pos /= 2
+        gripper_state /= 1
+        object_rot /= np.pi
+        object_velp /= 0.2
+        object_velr /= 2
+        grip_velp /= 0.05
+        gripper_vel /= 0.3
+
+        achieved_goal /= 2
+        desired_goal /= 2
+
+        obs = np.concatenate([ grip_pos, object_pos.ravel(), object_rel_pos.ravel(), gripper_state, object_rot.ravel(), object_velp.ravel(), object_velr.ravel(), grip_velp, gripper_vel, achieved_goal, desired_goal])
+        return obs
 
 
-        
+    def normalise_reward(self, reward):
+        # Normalise reward values
+        return reward
